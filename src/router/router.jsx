@@ -1,4 +1,4 @@
-import { Home } from "../pages/Homa"
+import { Home } from "../pages/Home"
 
 export const Router = () => {
     return(
