@@ -1,1 +1,5 @@
 @import "tailwindcss";
+
+.full-btn button{
+    width: 100% !important;  
+}
