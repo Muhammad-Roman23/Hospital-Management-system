@@ -3,3 +3,7 @@
 .full-btn button{
     width: 100% !important;  
 }
+
+.remove-margin-bottom{
+    margin-bottom: 0px;
+}

@@ -17,7 +17,7 @@ export const ContactUs = () => {
     message: ''
   });
 
-  const [status, setStatus] = useState('idle');
+  const [status, setStatus] = useState('');
 
   const handleChange = (property, value) => {
     setFormData({

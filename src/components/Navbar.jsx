@@ -1,15 +1,19 @@
 import { useState } from "react";
 import { MdMenu, MdClose } from "react-icons/md";
 import { Button } from "./webBtn";
+import { NavLink } from "react-router";
+// import { NavLink } from "react-router";
+// import { NavLink } from "react-router";
 // import { Button } from "@/components/ui/button";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinks = [
-    { name: "Home", href: "#home" },
-    { name: "About", href: "#about" },
-    { name: "Services", href: "#services" },
+    { name: "Home", href: "/" },
+    { name: "About", href: "/about" },
+    { name: "Appointment", href: "/appointment" },
+    { name: "Hospital", href: "/hospitals" },
     { name: "Contact", href: "#contact" },
   ];
 
@@ -31,6 +35,7 @@ export const Navbar = () => {
           <div className="hidden md:flex items-center justify-between space-x-1">
             <div className="nav-item flex">
               {navLinks.map((link) => (
+                <NavLink to={link.href}>
                 <p
                   key={link.name}
                   href={link.href}
@@ -38,6 +43,8 @@ export const Navbar = () => {
                 >
                   {link.name}
                 </p>
+                   </NavLink>
+
               ))}
             </div>
           </div>

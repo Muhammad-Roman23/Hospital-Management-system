@@ -1,8 +1,8 @@
 import { Button } from "./webBtn"
-import BannerPhoto from "../assets/webPhotos/homePageBannerPhoto.jpg"
+// import BannerPhoto from "../assets/webPhotos/homePageBannerPhoto.jpg"
 import Container from "./LayoutContainer"
 
-export const Banner = () => {
+export const Banner = ({bannerHead,bannerPara,bannerPhoto}) => {
     return(
         <Container >
 
@@ -13,10 +13,10 @@ export const Banner = () => {
         {/* Column 1 - Content */}
         <div>
           <h1 className="text-4xl font-bold text-gray-800 mb-4">
-            Protect Your Health, One Vaccine at a Time
+           {bannerHead}
           </h1>
           <p className="text-gray-600 mb-6 leading-relaxed">
-           Stay informed and protected with our easy-to-use vaccine finder. Explore trusted hospitals, check real-time vaccine availability, and book your slot with confidence. Your health and safety are our top priority.
+         {bannerPara}
           </p>
           <Button/>
         </div>
@@ -24,7 +24,7 @@ export const Banner = () => {
         {/* Column 2 - Image */}
         <div className="flex justify-end">
           <img
-            src={BannerPhoto}
+            src={bannerPhoto}
             alt="Flower Decoration"
             className="rounded-2xl shadow-lg w-full"
           />
