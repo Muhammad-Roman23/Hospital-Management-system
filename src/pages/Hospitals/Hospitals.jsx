@@ -1,5 +1,5 @@
 import { Banner } from "../../components/Banner"
-import BannerPhoto from "../../assets/webPhotos/AboutBannerPhoto.avif";
+import BannerPhoto from "../../assets/webPhotos/HospitalPageBannerPhoto.jpg";
 import { Hospitals } from "../../components/Hospitals";
 import Hospital1 from "../../assets/webPhotos/HospitalPhotos/hospital1.jpg"
 import Hospital2 from "../../assets/webPhotos/HospitalPhotos/hospital2.jpg"
@@ -31,7 +31,6 @@ import Hospital27 from "../../assets/webPhotos/HospitalPhotos/hospital27.jpg"
 import Hospital28 from "../../assets/webPhotos/HospitalPhotos/hospital28.jpg"
 import Hospital29 from "../../assets/webPhotos/HospitalPhotos/hospital29.jpg"
 import Hospital30 from "../../assets/webPhotos/HospitalPhotos/hospital30.jpg"
-import { useEffect, useState } from "react";
 
 export const HospitalPage = () => {
   const hospitalsData = [
@@ -307,27 +306,13 @@ export const HospitalPage = () => {
     }
   ];
   
-  // const [newData,setnewData] = useState(/)
 
-  // let a= {
-  //   min:3,
-  //   max:5
-  // }
-  // console.log(a);
-  
-
-
-
-  
-
-
-  // setData(hospitalsData)
   
 
       const bannerHead =
-    "Efficient, Reliable & Secure Vaccine Management for Everyone";
+    "Connecting Patients with Quality Healthcare Online";
   const bannerPara =
-    "Our Vaccine Management System helps hospitals, clinics, and users track vaccine availability, schedule appointments, and receive timely reminders — all in one place. Stay updated with real-time data and ensure every dose reaches those who need it most.";
+    "Experience a smarter way to manage hospitals, patients, and medical records. Our system ensures fast access, better coordination, and improved healthcare outcomes for everyone.";
     return(
         <>
         <Banner bannerHead={bannerHead}bannerPara={bannerPara}bannerPhoto={BannerPhoto} />

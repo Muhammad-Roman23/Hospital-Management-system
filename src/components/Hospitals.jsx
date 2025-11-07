@@ -26,15 +26,15 @@ export const Hospitals = ({ hospitalsData, showText, showInput }) => {
       setFilteredHospitals(hospitalsData);
       return;
     }
-
-    const filtered = hospitalsData.filter(
-      (hospital) =>
+    const filtered = hospitalsData.filter((hospital) => {
+      return (
         hospital.name.toLowerCase().includes(val.toLowerCase()) ||
         hospital.location.toLowerCase().includes(val.toLowerCase()) ||
         hospital.availableVaccines.some((vaccine) =>
           vaccine.toLowerCase().includes(val.toLowerCase())
         )
-    );
+      );
+    });
 
     setFilteredHospitals(filtered);
   };
