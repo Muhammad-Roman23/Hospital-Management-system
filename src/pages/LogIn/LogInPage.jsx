@@ -1,73 +1,119 @@
-import React, { useState } from 'react';
+ import React, { useState } from 'react';
 import { FaHospital, FaLock, FaRegEnvelope, FaUser, FaUserShield } from 'react-icons/fa';
 import { MdLogin } from 'react-icons/md';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Container from '../../components/LayoutContainer';
-import BannerPhoto from "../../assets/webPhotos/LogInPagePhoto.jpg";
-import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
-import { app } from '../../Firebase/Config'; // ✅ Make sure your firebase.js exports app
+import BannerPhoto from "../../assets/webPhotos/LogInPagePhoto.jpg"
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../../Firebase/Config";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
+
+
+
+
 
 export const LoginPage = () => {
   const [role, setRole] = useState('user');
-  const [data, setdata] = useState({
-    email: "",
-    password: ""
-  });
-  const [errorMsg, setErrorMsg] = useState("");
-  const navigate = useNavigate();
-  const db = getFirestore(app);
+  const [data,setdata] = useState({
+    email:"",
+    password:""
+  })
 
-  const handleChange = (value, property) => {
-    setdata({ ...data, [property]: value });
-  };
+  const handleChange = (value,property) => {
+    setdata({...data, [property] :value})
+  }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrorMsg("");
+ const navigate = useNavigate();
 
-    try {
-      // ✅ Get the collection based on role (user / hospital / admin)
-      const collectionRef = collection(db, role);
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-      // ✅ Check if email and password match
-      const q = query(
-        collectionRef,
-        where("email", "==", data.email),
-        where("password", "==", data.password)
-      );
+  try {
+    // 1) Sign in user using Firebase Auth
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      data.email,
+      data.password
+    );
 
-      const querySnapshot = await getDocs(q);
+    const uid = userCredential.user.uid;
 
-      if (!querySnapshot.empty) {
-        console.log("Login successful!");
-        navigate("/"); // ✅ redirect to homepage
-      } else {
-        setErrorMsg("Invalid email or password. Please try again.");
-      }
-    } catch (error) {
-      console.error("Login Error:", error);
-      setErrorMsg("Something went wrong. Please try again later.");
+    // 2) Check correct Firestore collection based on selected role
+    let collectionName = "users";
+    if (role === "hospital") collectionName = "hospitals";
+    if (role === "admin") collectionName = "admins";
+
+    // 3) Find user from correct collection
+    const docRef = doc(db, collectionName, uid);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      // ❌ Wrong role selected
+      Swal.fire({
+        title: "Role Mismatch!",
+        text: `This account does not belong to ${role}.`,
+        icon: "error",
+        confirmButtonColor: "#dc2626",
+      });
+      return;
     }
 
-    setdata({
-      email: "",
-      password: ""
+    const userData = docSnap.data();
+
+    // 4) If matched → redirect to dashboard
+    Swal.fire({
+      title: "Login Successful!",
+      text: `Welcome ${userData.fullName}!`,
+      icon: "success",
+      confirmButtonColor: "#0d9488",
     });
-  };
+
+    // 🟢 Navigate to proper dashboard
+    if (role === "user") navigate("/user-dashboard");
+    if (role === "hospital") navigate("/hospital-dashboard");
+    if (role === "admin") navigate("/admin-dashboard");
+
+  } catch (error) {
+    console.error(error);
+
+    let msg = "Login failed. Please try again.";
+
+    if (error.code === "auth/user-not-found") msg = "No account found with this email.";
+    if (error.code === "auth/wrong-password") msg = "Incorrect password.";
+    if (error.code === "auth/invalid-email") msg = "Invalid email format.";
+
+    Swal.fire({
+      title: "Login Failed",
+      text: msg,
+      icon: "error",
+      confirmButtonColor: "#dc2626",
+    });
+  }
+};
+
 
   const roles = [
     { id: 'user', label: 'User', icon: <FaUser className="w-6 h-6" />, desc: 'Book & track your vaccination' },
     { id: 'hospital', label: 'Hospital', icon: <FaHospital className="w-6 h-6" />, desc: 'Manage appointments & records' },
-    { id: 'admin', label: <FaUserShield className="w-6 h-6" />, desc: 'System control & analytics' }
+    { id: 'admin', label: 'Admin', icon: <FaUserShield className="w-6 h-6" />, desc: 'System control & analytics' }
   ];
 
   return (
-    <Container>
+ <Container>
+    
+
       <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-        {/* Left side image */}
-        <div className="hidden lg:block">
+        
+        {/* Left: Image (Stops Scroll) */}
+ <div className="hidden lg:block">
           <div className="relative h-full min-h-[600px] rounded-3xl overflow-hidden shadow-2xl">
-            <img src={BannerPhoto} alt="Healthcare Professional" className="object-cover" />
+            <img
+              src={BannerPhoto}
+              alt="Healthcare Professional"
+              className="object-cover"
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             <div className="absolute bottom-8 left-8 text-white">
               <h3 className="text-3xl font-bold mb-2">Your Health, Our Priority</h3>
@@ -75,9 +121,13 @@ export const LoginPage = () => {
             </div>
           </div>
         </div>
-
-        {/* Right side form */}
+        {/* Right: Login Form */}
         <div className="w-full space-y-8">
+
+         
+       
+
+          {/* Role Selection */}
           <div className="bg-white rounded-3xl shadow-xl p-8">
             <h3 className="text-xl font-semibold text-gray-800 mb-6 text-center lg:text-left">
               Select Your Role
@@ -106,11 +156,19 @@ export const LoginPage = () => {
                       {r.label}
                     </h4>
                   </div>
+                  {role === r.id && (
+                    <div className="absolute top-1 right-1 w-5 h-5 bg-teal-600 rounded-full flex items-center justify-center">
+                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
 
-            <form className="space-y-5" onSubmit={handleSubmit}>
+            {/* Login Form */}
+            <form className="space-y-5" onSubmit={handleSubmit} >
               <div>
                 <label className="flex items-center gap-2 text-gray-700 font-medium mb-2">
                   <FaRegEnvelope className="w-5 h-5 text-teal-600" />
@@ -119,7 +177,7 @@ export const LoginPage = () => {
                 <input
                   type="email"
                   value={data.email}
-                  onChange={(e) => handleChange(e.target.value, "email")}
+                  onChange={(e)=>handleChange(e.target.value,"email")}
                   required
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-4 focus:ring-teal-100 transition-all outline-none"
                   placeholder="you@example.com"
@@ -135,17 +193,21 @@ export const LoginPage = () => {
                   type="password"
                   required
                   value={data.password}
-                  onChange={(e) => handleChange(e.target.value, "password")}
+                  onChange={(e)=>{handleChange(e.target.value,"password")}}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-4 focus:ring-teal-100 transition-all outline-none"
                   placeholder="••••••••"
                 />
               </div>
 
-              {errorMsg && (
-                <p className="text-red-600 text-sm text-center font-medium">
-                  {errorMsg}
-                </p>
-              )}
+              <div className="flex items-center justify-between text-sm">
+                <label className="flex items-center gap-2 text-gray-600">
+                  <input type="checkbox" className="w-4 h-4 text-teal-600 rounded focus:ring-teal-100" />
+                  Remember me
+                </label>
+                <a href="#" className="text-teal-600 hover:text-teal-700 font-medium">
+                  Forgot password?
+                </a>
+              </div>
 
               <button
                 type="submit"
@@ -176,7 +238,12 @@ export const LoginPage = () => {
             </div>
           </div>
         </div>
+
+       
+
       </div>
-    </Container>
+ </Container>
+
+    
   );
 };
