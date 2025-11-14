@@ -1,98 +1,19 @@
- import React, { useState } from 'react';
+import React, { useState } from 'react';
+import Swal from "sweetalert2";
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 import { FaHospital, FaLock, FaRegEnvelope, FaUser, FaUserShield } from 'react-icons/fa';
 import { MdLogin } from 'react-icons/md';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
 import Container from '../../components/LayoutContainer';
-import BannerPhoto from "../../assets/webPhotos/LogInPagePhoto.jpg"
+import BannerPhoto from "../../assets/webPhotos/LogInPagePhoto.jpg";
+import { auth, db } from "../../Firebase/Config";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "../../Firebase/Config";
-import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
-
-
-
-
 
 export const LoginPage = () => {
   const [role, setRole] = useState('user');
-  const [data,setdata] = useState({
-    email:"",
-    password:""
-  })
-
-  const handleChange = (value,property) => {
-    setdata({...data, [property] :value})
-  }
-
- const navigate = useNavigate();
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  try {
-    // 1) Sign in user using Firebase Auth
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      data.email,
-      data.password
-    );
-
-    const uid = userCredential.user.uid;
-
-    // 2) Check correct Firestore collection based on selected role
-    let collectionName = "users";
-    if (role === "hospital") collectionName = "hospitals";
-    if (role === "admin") collectionName = "admins";
-
-    // 3) Find user from correct collection
-    const docRef = doc(db, collectionName, uid);
-    const docSnap = await getDoc(docRef);
-
-    if (!docSnap.exists()) {
-      // ❌ Wrong role selected
-      Swal.fire({
-        title: "Role Mismatch!",
-        text: `This account does not belong to ${role}.`,
-        icon: "error",
-        confirmButtonColor: "#dc2626",
-      });
-      return;
-    }
-
-    const userData = docSnap.data();
-
-    // 4) If matched → redirect to dashboard
-    Swal.fire({
-      title: "Login Successful!",
-      text: `Welcome ${userData.fullName}!`,
-      icon: "success",
-      confirmButtonColor: "#0d9488",
-    });
-
-    // 🟢 Navigate to proper dashboard
-    if (role === "user") navigate("/user-dashboard");
-    if (role === "hospital") navigate("/hospital-dashboard");
-    if (role === "admin") navigate("/admin-dashboard");
-
-  } catch (error) {
-    console.error(error);
-
-    let msg = "Login failed. Please try again.";
-
-    if (error.code === "auth/user-not-found") msg = "No account found with this email.";
-    if (error.code === "auth/wrong-password") msg = "Incorrect password.";
-    if (error.code === "auth/invalid-email") msg = "Invalid email format.";
-
-    Swal.fire({
-      title: "Login Failed",
-      text: msg,
-      icon: "error",
-      confirmButtonColor: "#dc2626",
-    });
-  }
-};
-
+  const navigate = useNavigate();
 
   const roles = [
     { id: 'user', label: 'User', icon: <FaUser className="w-6 h-6" />, desc: 'Book & track your vaccination' },
@@ -100,20 +21,84 @@ const handleSubmit = async (e) => {
     { id: 'admin', label: 'Admin', icon: <FaUserShield className="w-6 h-6" />, desc: 'System control & analytics' }
   ];
 
-  return (
- <Container>
-    
+  const initialValues = { email: '', password: '' };
 
+  const validationSchema = Yup.object().shape({
+    email: Yup.string().email('Invalid email format').required('Email is required'),
+    password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+  });
+
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      // 1) Sign in user using Firebase Auth
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        values.email,
+        values.password
+      );
+
+      const uid = userCredential.user.uid;
+
+      // 2) Check correct Firestore collection based on selected role
+      let collectionName = "users";
+      if (role === "hospital") collectionName = "hospitals";
+      if (role === "admin") collectionName = "admins";
+
+      // 3) Find user from correct collection
+      const docRef = doc(db, collectionName, uid);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        Swal.fire({
+          title: "Role Mismatch!",
+          text: `This account does not belong to ${role}.`,
+          icon: "error",
+          confirmButtonColor: "#dc2626",
+        });
+        return;
+      }
+
+      const userData = docSnap.data();
+
+      // 4) Success message
+      Swal.fire({
+        title: "Login Successful!",
+        text: `Welcome ${userData.fullName}!`,
+        icon: "success",
+        confirmButtonColor: "#0d9488",
+      });
+
+      // 5) Navigate to proper dashboard
+      if (role === "user") navigate("/user-dashboard");
+      if (role === "hospital") navigate("/hospital-dashboard");
+      if (role === "admin") navigate("/admin-dashboard");
+
+    } catch (error) {
+      console.error(error);
+      let msg = "Login failed. Please try again.";
+      if (error.code === "auth/user-not-found") msg = "No account found with this email.";
+      if (error.code === "auth/wrong-password") msg = "Incorrect password.";
+      if (error.code === "auth/invalid-email") msg = "Invalid email format.";
+
+      Swal.fire({
+        title: "Login Failed",
+        text: msg,
+        icon: "error",
+        confirmButtonColor: "#dc2626",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <Container>
       <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-        
-        {/* Left: Image (Stops Scroll) */}
- <div className="hidden lg:block">
+
+        {/* LEFT: Image */}
+        <div className="hidden lg:block">
           <div className="relative h-full min-h-[600px] rounded-3xl overflow-hidden shadow-2xl">
-            <img
-              src={BannerPhoto}
-              alt="Healthcare Professional"
-              className="object-cover"
-            />
+            <img src={BannerPhoto} alt="Healthcare Professional" className="object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             <div className="absolute bottom-8 left-8 text-white">
               <h3 className="text-3xl font-bold mb-2">Your Health, Our Priority</h3>
@@ -121,27 +106,18 @@ const handleSubmit = async (e) => {
             </div>
           </div>
         </div>
-        {/* Right: Login Form */}
+
+        {/* RIGHT: Login Form */}
         <div className="w-full space-y-8">
-
-         
-       
-
-          {/* Role Selection */}
           <div className="bg-white rounded-3xl shadow-xl p-8">
-            <h3 className="text-xl font-semibold text-gray-800 mb-6 text-center lg:text-left">
-              Select Your Role
-            </h3>
-
+            <h3 className="text-xl font-semibold text-gray-800 mb-6 text-center lg:text-left">Select Your Role</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
               {roles.map((r) => (
                 <div
                   key={r.id}
                   onClick={() => setRole(r.id)}
                   className={`group relative cursor-pointer p-5 rounded-2xl border-2 transition-all duration-300 text-center ${
-                    role === r.id
-                      ? "border-teal-500 bg-teal-50 shadow-lg"
-                      : "border-gray-200 bg-white hover:border-teal-300 hover:shadow-md"
+                    role === r.id ? "border-teal-500 bg-teal-50 shadow-lg" : "border-gray-200 bg-white hover:border-teal-300 hover:shadow-md"
                   }`}
                 >
                   <div className="flex flex-col items-center space-y-2">
@@ -152,9 +128,7 @@ const handleSubmit = async (e) => {
                     </div>
                     <h4 className={`font-semibold text-base ${
                       role === r.id ? "text-teal-700" : "text-gray-800 group-hover:text-teal-600"
-                    }`}>
-                      {r.label}
-                    </h4>
+                    }`}>{r.label}</h4>
                   </div>
                   {role === r.id && (
                     <div className="absolute top-1 right-1 w-5 h-5 bg-teal-600 rounded-full flex items-center justify-center">
@@ -167,83 +141,82 @@ const handleSubmit = async (e) => {
               ))}
             </div>
 
-            {/* Login Form */}
-            <form className="space-y-5" onSubmit={handleSubmit} >
-              <div>
-                <label className="flex items-center gap-2 text-gray-700 font-medium mb-2">
-                  <FaRegEnvelope className="w-5 h-5 text-teal-600" />
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  value={data.email}
-                  onChange={(e)=>handleChange(e.target.value,"email")}
-                  required
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-4 focus:ring-teal-100 transition-all outline-none"
-                  placeholder="you@example.com"
-                />
-              </div>
+            {/* Formik Form */}
+            <Formik
+              initialValues={initialValues}
+              validationSchema={validationSchema}
+              onSubmit={handleSubmit}
+            >
+              {({ isSubmitting }) => (
+                <Form className="space-y-5">
+                  {/* Email */}
+                  <div>
+                    <label className="flex items-center gap-2 text-gray-700 font-medium mb-2">
+                      <FaRegEnvelope className="w-5 h-5 text-teal-600" /> Email Address
+                    </label>
+                    <Field
+                      type="email"
+                      name="email"
+                      placeholder="you@example.com"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-4 focus:ring-teal-100 transition-all outline-none"
+                    />
+                    <ErrorMessage name="email" component="div" className="text-red-500 text-sm mt-1" />
+                  </div>
 
-              <div>
-                <label className="flex items-center gap-2 text-gray-700 font-medium mb-2">
-                  <FaLock className="w-5 h-5 text-teal-600" />
-                  Password
-                </label>
-                <input
-                  type="password"
-                  required
-                  value={data.password}
-                  onChange={(e)=>{handleChange(e.target.value,"password")}}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-4 focus:ring-teal-100 transition-all outline-none"
-                  placeholder="••••••••"
-                />
-              </div>
+                  {/* Password */}
+                  <div>
+                    <label className="flex items-center gap-2 text-gray-700 font-medium mb-2">
+                      <FaLock className="w-5 h-5 text-teal-600" /> Password
+                    </label>
+                    <Field
+                      type="password"
+                      name="password"
+                      placeholder="••••••••"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-4 focus:ring-teal-100 transition-all outline-none"
+                    />
+                    <ErrorMessage name="password" component="div" className="text-red-500 text-sm mt-1" />
+                  </div>
 
-              <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2 text-gray-600">
-                  <input type="checkbox" className="w-4 h-4 text-teal-600 rounded focus:ring-teal-100" />
-                  Remember me
-                </label>
-                <a href="#" className="text-teal-600 hover:text-teal-700 font-medium">
-                  Forgot password?
-                </a>
-              </div>
+                  {/* Remember & Forgot */}
+                  <div className="flex items-center justify-between text-sm">
+                    <label className="flex items-center gap-2 text-gray-600">
+                      <input type="checkbox" className="w-4 h-4 text-teal-600 rounded focus:ring-teal-100" />
+                      Remember me
+                    </label>
+                    <a href="#" className="text-teal-600 hover:text-teal-700 font-medium">
+                      Forgot password?
+                    </a>
+                  </div>
 
-              <button
-                type="submit"
-                className="w-full py-3.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-md hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
-              >
-                <MdLogin className="w-5 h-5" />
-                Log In as {role.charAt(0).toUpperCase() + role.slice(1)}
-              </button>
-            </form>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full py-3.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-md hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+                  >
+                    <MdLogin className="w-5 h-5" /> Log In as {role.charAt(0).toUpperCase() + role.slice(1)}
+                  </button>
 
-            <div className="mt-6 text-center">
-              <p className="text-gray-600 text-sm">
-                Don’t have an account?{" "}
-                <Link
-                  to="/register"
-                  className="font-semibold text-teal-600 hover:text-teal-700 underline-offset-4 hover:underline"
-                >
-                  Register Yourself
-                </Link>
-              </p>
-            </div>
+                  <div className="mt-6 text-center">
+                    <p className="text-gray-600 text-sm">
+                      Don’t have an account?{" "}
+                      <Link to="/register" className="font-semibold text-teal-600 hover:text-teal-700 underline-offset-4 hover:underline">
+                        Register Yourself
+                      </Link>
+                    </p>
+                  </div>
 
-            <div className="mt-6 text-center">
-              <p className="text-xs text-gray-500 flex items-center justify-center gap-1">
-                <FaLock className="w-3.5 h-3.5 text-teal-600" />
-                Your data is secure and encrypted
-              </p>
-            </div>
+                  <div className="mt-6 text-center">
+                    <p className="text-xs text-gray-500 flex items-center justify-center gap-1">
+                      <FaLock className="w-3.5 h-3.5 text-teal-600" />
+                      Your data is secure and encrypted
+                    </p>
+                  </div>
+                </Form>
+              )}
+            </Formik>
           </div>
         </div>
-
-       
-
       </div>
- </Container>
-
-    
+    </Container>
   );
 };
