@@ -17,7 +17,7 @@ export const Navbar = () => {
   ];
 
   return (
-    <nav className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 shadow-lg">
+    <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-lg">
       <div className="container-fluid mx-auto px-4 sm:px-6 lg:px-20 md:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
