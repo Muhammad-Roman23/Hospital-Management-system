@@ -15,8 +15,10 @@ import BannerPhoto from "../../assets/webPhotos/LogInPagePhoto.jpg";
 import { auth, db } from "../../Firebase/Config";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
+import { useNavigate } from 'react-router';
 
 export const RegisterPage = () => {
+  const navigate = useNavigate()
   const [role, setRole] = useState("user");
 
   const roles = [
@@ -57,6 +59,7 @@ export const RegisterPage = () => {
       email: values.email,
       role: role,
     };
+    
     if (role === "user") dataToSend.cnic = values.cnic;
     if (role === "hospital") dataToSend.hospitalName = values.hospitalName;
     if (role === "admin") dataToSend.adminCode = values.adminCode;
@@ -78,6 +81,7 @@ export const RegisterPage = () => {
         ...dataToSend,
         uid,
         createdAt: new Date(),
+         approved: role === "user" || role === "hospital" ? false : true,
       });
 
       Swal.fire({
@@ -86,6 +90,9 @@ export const RegisterPage = () => {
         icon: "success",
         confirmButtonColor: "#0d9488",
       });
+        if  (role === "user") navigate("/login");
+      if (role === "hospital") navigate("/login");
+      if (role === "admin") navigate("/login");
 
       resetForm();
       setRole("user");
@@ -103,6 +110,7 @@ export const RegisterPage = () => {
       });
     }
   };
+
 
   return (
     <Container>

@@ -21,75 +21,88 @@ export const LoginPage = () => {
     { id: 'admin', label: 'Admin', icon: <FaUserShield className="w-6 h-6" />, desc: 'System control & analytics' }
   ];
 
-  const initialValues = { email: '', password: '' };
+  const initialValues = { email: '', password: '' };  
 
   const validationSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email format').required('Email is required'),
     password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
   });
+const handleSubmit = async (values, { setSubmitting }) => {
+  try {
+    // 1) Sign in user using Firebase Auth
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      values.email,
+      values.password
+    );
 
-  const handleSubmit = async (values, { setSubmitting }) => {
-    try {
-      // 1) Sign in user using Firebase Auth
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        values.email,
-        values.password
-      );
+    const uid = userCredential.user.uid;
 
-      const uid = userCredential.user.uid;
+    // 2) Check correct Firestore collection based on selected role
+    let collectionName = "users";
+    if (role === "hospital") collectionName = "hospitals";
+    if (role === "admin") collectionName = "admins";
 
-      // 2) Check correct Firestore collection based on selected role
-      let collectionName = "users";
-      if (role === "hospital") collectionName = "hospitals";
-      if (role === "admin") collectionName = "admins";
+    // 3) Find user from correct collection
+    const docRef = doc(db, collectionName, uid);
+    const docSnap = await getDoc(docRef);
 
-      // 3) Find user from correct collection
-      const docRef = doc(db, collectionName, uid);
-      const docSnap = await getDoc(docRef);
-
-      if (!docSnap.exists()) {
-        Swal.fire({
-          title: "Role Mismatch!",
-          text: `This account does not belong to ${role}.`,
-          icon: "error",
-          confirmButtonColor: "#dc2626",
-        });
-        return;
-      }
-
-      const userData = docSnap.data();
-
-      // 4) Success message
+    if (!docSnap.exists()) {
       Swal.fire({
-        title: "Login Successful!",
-        text: `Welcome ${userData.fullName}!`,
-        icon: "success",
-        confirmButtonColor: "#0d9488",
-      });
-
-      // 5) Navigate to proper dashboard
-      if (role === "user") navigate("/user-dashboard");
-      if (role === "hospital") navigate("/hospital-dashboard");
-      if (role === "admin") navigate("/admin-dashboard");
-
-    } catch (error) {
-      console.error(error);
-      let msg = "Login failed. Please try again.";
-      if (error.code === "auth/user-not-found") msg = "No account found with this email.";
-      if (error.code === "auth/wrong-password") msg = "Incorrect password.";
-      if (error.code === "auth/invalid-email") msg = "Invalid email format.";
-
-      Swal.fire({
-        title: "Login Failed",
-        text: msg,
+        title: "Role Mismatch!",
+        text: `This account does not belong to ${role}.`,
         icon: "error",
         confirmButtonColor: "#dc2626",
       });
-    } finally {
-      setSubmitting(false);
+      return;
     }
-  };
+
+    const userData = docSnap.data();
+
+    // 4) Check approval status for hospital or user
+    if (role === "hospital" || role === "user") {
+      if (!userData.approved) {
+        Swal.fire({
+          title: "Account Not Approved",
+          text: "Your account is pending admin approval. Please wait.",
+          icon: "warning",
+          confirmButtonColor: "#f59e0b",
+        });
+        return; // stop navigation until approved
+      }
+    }
+
+    // 5) Success message
+    Swal.fire({
+      title: "Login Successful!",
+      text: `Welcome ${userData.fullName || userData.name}!`,
+      icon: "success",
+      confirmButtonColor: "#0d9488",
+    });
+
+    // 6) Navigate to proper dashboard
+    if (role === "user") navigate("/userdashboard");       // user dashboard
+    if (role === "hospital") navigate("/hospitaldashboard"); // hospital dashboard
+    if (role === "admin") navigate("/admindashboard");     // admin dashboard
+
+  } catch (error) {
+    console.error(error);
+    let msg = "Login failed. Please try again.";
+    if (error.code === "auth/user-not-found") msg = "No account found with this email.";
+    if (error.code === "auth/wrong-password") msg = "Incorrect password.";
+    if (error.code === "auth/invalid-email") msg = "Invalid email format.";
+
+    Swal.fire({
+      title: "Login Failed",
+      text: msg,
+      icon: "error",
+      confirmButtonColor: "#dc2626",
+    });
+  } finally {
+    setSubmitting(false);
+  }
+};
+
 
   return (
     <Container>
