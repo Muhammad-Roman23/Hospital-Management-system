@@ -1,19 +1,65 @@
 // layout/SidebarLayout.jsx
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import {
   FaHospital, FaUsers, FaBuilding, FaCog,
   FaBars, FaTimes, FaSignOutAlt, FaUserShield
 } from "react-icons/fa";
+import { doc, getDoc } from "firebase/firestore";
+
+
+import { db } from "../../Firebase/Config"; // correct path
+// import { collection, getDocs, query, where } from "firebase/firestore";
+
+
+
+
 
 const menuItems = [
   { title: "Dashboard", icon: FaBuilding, path: "/admindashboard" },
-  { title: "Manage Hospitals", icon: FaHospital, path: "/adminhospitals", badge: "3 Pending" },
+  { title: "Manage Hospitals", icon: FaHospital, path: "/adminhospitals"},
   { title: "Manage Patients", icon: FaUsers, path: "/Patients" },
   // { title: "System Settings", icon: FaCog, path: "/admin/settings" },
 ];
 
 export const SidebarLayout = () => {
+
+  const [admin, setAdmin] = useState(null);
+
+
+
+useEffect(() => {
+  const fetchAdmin = async () => {
+    try {
+      const currentUserId = localStorage.getItem("userid");
+      console.log("Current Admin ID:", currentUserId);
+      if (!currentUserId) return;
+
+      const docRef = doc(db, "admins", currentUserId); // direct document reference
+      console.log(docRef);
+      
+      const docSnap = await getDoc(docRef);
+      console.log(docSnap);
+      
+
+      if (docSnap.exists()) {
+        const adminData = docSnap.data();
+        console.log(adminData);
+        
+        setAdmin(adminData);
+        console.log("Admin fetched:", adminData);
+      } else {
+        console.log("No such admin document!");
+      }
+    } catch (error) {
+      console.error("Error fetching admin:", error);
+    }
+  };
+
+  fetchAdmin();
+}, []);
+
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const location = useLocation();
 
@@ -71,12 +117,13 @@ export const SidebarLayout = () => {
             </h2>
 
             <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="font-semibold text-lg">Ahmad Khan</p>
-                <p className="text-sm text-teal-300 flex items-center gap-1">
-                  <FaUserShield className="w-4 h-4" /> Super Admin
-                </p>
-              </div>
+             <div className="text-right">
+  <p className="font-semibold text-lg">{admin ? admin.fullName : "Loading..."}</p>
+  <p className="text-sm text-teal-300 flex items-center gap-1">
+    <FaUserShield className="w-4 h-4" /> {admin?.role || "Super Admin"}
+  </p>
+</div>
+
               <button className="p-3 bg-gradient-to-r from-teal-500 to-blue-600 rounded-xl hover:from-teal-600 hover:to-blue-700 transition-all shadow-lg">
                 <FaSignOutAlt className="w-6 h-6" />
               </button>

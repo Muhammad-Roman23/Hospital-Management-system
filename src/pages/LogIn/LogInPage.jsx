@@ -10,6 +10,7 @@ import BannerPhoto from "../../assets/webPhotos/LogInPagePhoto.jpg";
 import { auth, db } from "../../Firebase/Config";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import { Patients } from '../AdminDashboard/Patients';
 
 export const LoginPage = () => {
   const [role, setRole] = useState('user');
@@ -37,6 +38,8 @@ const handleSubmit = async (values, { setSubmitting }) => {
     );
 
     const uid = userCredential.user.uid;
+
+    localStorage.setItem("userid",uid)
 
     // 2) Check correct Firestore collection based on selected role
     let collectionName = "users";
