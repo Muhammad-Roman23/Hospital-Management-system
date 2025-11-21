@@ -10,7 +10,7 @@ import BannerPhoto from "../../assets/webPhotos/LogInPagePhoto.jpg";
 import { auth, db } from "../../Firebase/Config";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { Patients } from '../AdminDashboard/Patients';
+// import { Patients } from '../AdminDashboard/Patients';
 
 export const LoginPage = () => {
   const [role, setRole] = useState('user');

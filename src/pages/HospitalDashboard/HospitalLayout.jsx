@@ -10,6 +10,7 @@ import { BiInjection } from "react-icons/bi";
 
 import { doc, getDoc } from "firebase/firestore";
 import { getAuth, signOut } from "firebase/auth";
+import { FiUser } from "react-icons/fi";
 
 
 
@@ -21,14 +22,15 @@ import { db } from "../../Firebase/Config"; // correct path
 
 
 const menuItems = [
-  { title: "Dashboard", icon: MdDashboard, path: "/admindashboard" },
-  { title: "Manage Hospitals", icon: FaHospital, path: "/adminhospitals"},
-  { title: "Manage Patients", icon: FaUsers, path: "/Patients" },
-  { title: "Manage Vaccines", icon: BiInjection, path: "/Vaccines" },
+  { title: "Dashboard", icon: MdDashboard, path: "/hospitaldashboard" },
+  { title: "Profile", icon: FiUser, path: "/hospitalprofile" },
+  // { title: "Manage Hospitals", icon: FaHospital, path: "/adminhospitals"},
+  // { title: "Manage Patients", icon: FaUsers, path: "/Patients" },
+  // { title: "Manage Vaccines", icon: BiInjection, path: "/Vaccines" },
   // { title: "System Settings", icon: FaCog, path: "/admin/settings" },
 ];
 
-export const SidebarLayout = () => {
+export const HospitalLayout = () => {
 
   const navigate = useNavigate()
 
@@ -80,7 +82,7 @@ const handleLogout = () => {
       // window.location.href = "/login";
       // <Link to  = {"/"} ></Link>
       // <Navigate to = {"/login"} />
-      navigate("/login")
+      navigate("/")
     })
     .catch((error) => {
       console.log("Logout Error:", error);
@@ -95,7 +97,7 @@ const handleLogout = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-white flex">
       {/* Sidebar */}
-      <aside className={`fixed lg:relative z-50 h-screen transition-all duration-300 bg-black/70 backdrop-blur-2xl border-r border-blue-500/20 ${sidebarOpen ? "w-72" : "w-20"}`}>
+      <aside className={`fixed lg:relative z-50 transition-all duration-300 bg-black/70 backdrop-blur-2xl border-r border-blue-500/20 ${sidebarOpen ? "w-72" : "w-20"}`}>
         <div className="flex items-center justify-between p-5 border-b border-blue-500/20">
           <div className="w-10"></div>
           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-3 hover:bg-white/10 rounded-xl transition-all">
@@ -142,7 +144,7 @@ const handleLogout = () => {
         <header className="bg-black/50 backdrop-blur-xl border-b border-blue-500/20">
           <div className="flex items-center justify-between px-8 py-5">
             <h2 className="text-3xl font-bold bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">
-              {menuItems.find(m => m.path === location.pathname).title || "Dashboard"}
+              {menuItems.find(m => m.path === location.pathname).title  }
             </h2>
 
             <div className="flex items-center gap-4">
@@ -161,7 +163,7 @@ const handleLogout = () => {
         </header>
 
         {/* Page Content */}
-        <main className={`flex-1 p-8 ${sidebarOpen ? "ml-0" : ""}`}>
+        <main className={`flex-1 pt-8 ps-8 pe-8 ${sidebarOpen ? "ml-0" : ""}`}>
           <Outlet/>
         </main>
       </div>
