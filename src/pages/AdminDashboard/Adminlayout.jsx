@@ -25,6 +25,7 @@ const menuItems = [
   { title: "Manage Hospitals", icon: FaHospital, path: "/adminhospitals"},
   { title: "Manage Patients", icon: FaUsers, path: "/Patients" },
   { title: "Manage Vaccines", icon: BiInjection, path: "/Vaccines" },
+  { title: "Appointments", icon: BiInjection, path: "/appointments" },
   // { title: "System Settings", icon: FaCog, path: "/admin/settings" },
 ];
 
@@ -95,10 +96,10 @@ const handleLogout = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-white flex">
       {/* Sidebar */}
-      <aside className={`fixed lg:relative z-50 h-screen transition-all duration-300 bg-black/70 backdrop-blur-2xl border-r border-blue-500/20 ${sidebarOpen ? "w-72" : "w-20"}`}>
+      <aside className={`fixed lg:relative z-50 transition-all duration-300 bg-black/70 backdrop-blur-2xl border-r border-blue-500/20 ${sidebarOpen ? "w-72" : "w-20"}`}>
         <div className="flex items-center justify-between p-5 border-b border-blue-500/20">
           <div className="w-10"></div>
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-3 hover:bg-white/10 rounded-xl transition-all">
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-3 hover:bg-white/10 rounded-xl transition-all cursor-pointer">
             {sidebarOpen ? <FaTimes className="w-6 h-6" /> : <FaBars className="w-6 h-6" />}
           </button>
         </div>
@@ -153,7 +154,7 @@ const handleLogout = () => {
   </p>
 </div>
 
-              <button onClick={handleLogout} className="p-3 bg-gradient-to-r from-teal-500 to-blue-600 rounded-xl hover:from-teal-600 hover:to-blue-700 transition-all shadow-lg">
+              <button onClick={handleLogout} className="p-3 bg-gradient-to-r from-teal-500 to-blue-600 rounded-xl hover:from-teal-600 hover:to-blue-700 transition-all shadow-lg cursor-pointer">
                 <FaSignOutAlt className="w-6 h-6" />
               </button>
             </div>

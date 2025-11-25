@@ -7,10 +7,43 @@ import {
   FaPlusCircle, 
   FaEye 
 } from "react-icons/fa";
+import { useState,useEffect } from "react";
 import { Link } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+// import { auth, db } from "../Firebase/Config";   // <-- apna path use karo
+import { auth,db } from "../../Firebase/Config";
+
 
 export const HospitalsOverview = () => {
-  const hospitalName = "City Care Hospital";
+  const [hospitalName, setHospitalName] = useState("");
+
+  
+useEffect(() => {
+  const fetchHospitalData = async () => {
+    try {
+      const user = auth.currentUser;
+      console.log(user);
+      
+
+      if (user) {
+        const docRef = doc(db, "hospitals", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setHospitalName(docSnap.data().hospitalName); 
+        } else {
+          console.log("No such document!");
+        }
+      }
+    } catch (error) {
+      console.log("Error fetching hospital data:", error);
+    }
+  };
+
+  fetchHospitalData();
+}, []);
+
+  // const hospitalName = "City Care Hospital";
 
   // Dummy data (baad mein Firebase ya API se replace kar dena)
   const stats = {
@@ -99,15 +132,15 @@ export const HospitalsOverview = () => {
 
       {/* Quick Action Buttons */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-        <Link to="/add-vaccine">
-          <button className="w-full flex items-center justify-center gap-4 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white font-bold text-lg py-5 px-8 rounded-xl transition-all shadow-xl">
+        <Link to="/hospitalprofile">
+          <button className="w-full flex cursor-pointer items-center justify-center gap-4 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white font-bold text-lg py-5 px-8 rounded-xl transition-all shadow-xl">
             <FaPlusCircle className="w-7 h-7" />
             Add New Vaccines
           </button>
         </Link>
 
-        <Link to="/appointments">
-          <button className="w-full flex items-center justify-center gap-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white font-bold text-lg py-5 px-8 rounded-xl transition-all shadow-xl">
+        <Link to="/hospitalappointments">
+          <button className="w-full flex items-center cursor-pointer justify-center gap-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white font-bold text-lg py-5 px-8 rounded-xl transition-all shadow-xl">
             <FaEye className="w-7 h-7" />
             View All Appointments
           </button>

@@ -207,7 +207,7 @@ const handleSubmit = async (values, { setSubmitting }) => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-md hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+                    className="w-full py-3.5 cursor-pointer bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-md hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
                   >
                     <MdLogin className="w-5 h-5" /> Log In as {role.charAt(0).toUpperCase() + role.slice(1)}
                   </button>

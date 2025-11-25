@@ -13,10 +13,12 @@ import { SidebarLayout } from "../pages/AdminDashboard/Adminlayout";
 import { Overview } from "../pages/AdminDashboard/overview";
 import { Hospitals } from "../pages/AdminDashboard/Hospitals";
 import { Patients } from "../pages/AdminDashboard/Patients";
-import { Vaccines } from "../pages/AdminDashboard/Vaccines";
+import { AvailableVaccines } from "../pages/AdminDashboard/Vaccines";
 import { HospitalLayout } from "../pages/HospitalDashboard/HospitalLayout";
 import { HospitalsOverview } from "../pages/HospitalDashboard/HospitalsOverview";
 import { HospitalProfile } from "../pages/HospitalDashboard/HospitalProfile";
+import { Hospitalappointments } from "../pages/HospitalDashboard/HospitalAppointments";
+import { Appointments } from "../pages/AdminDashboard/Appointment";
 
 export const Router = () => {
   return (
@@ -38,7 +40,8 @@ export const Router = () => {
              <Route path="/admindashboard" element={<Overview />} />
              <Route path="/adminhospitals" element={<Hospitals />} />
              <Route path="/Patients" element={<Patients />} />
-             <Route path="/vaccines" element={<Vaccines />} />
+             <Route path="/vaccines" element={<AvailableVaccines />} />
+             <Route path="/Appointments" element={<Appointments />} />
              {/* <Route path="/dashboard" element={<Overview />} /> */}
         </Route>
 
@@ -46,6 +49,7 @@ export const Router = () => {
           <Route element={<HospitalLayout />}>
     <Route path="/hospitaldashboard" element={<HospitalsOverview />} />
     <Route path="/hospitalprofile" element={<HospitalProfile />} />
+    <Route path="/hospitalappointments" element={<Hospitalappointments />} />
     {/* <Route path="/hospitalvaccines" element={<HospitalVaccines />} /> */}
     {/* aur hospital ke aur pages */}
   </Route>

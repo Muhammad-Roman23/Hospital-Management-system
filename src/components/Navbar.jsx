@@ -53,7 +53,7 @@ export const Navbar = () => {
           </div>
 
           {/* Button */}
-          <div className="hidden md:block">
+          <div className="hidden md:block cursor-pointer">
            <LogIn />
           </div>
 
