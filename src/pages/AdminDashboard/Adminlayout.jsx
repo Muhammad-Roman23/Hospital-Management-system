@@ -7,7 +7,7 @@ import {
 } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
 import { BiInjection } from "react-icons/bi";
-
+import { MdEventAvailable } from "react-icons/md";
 import { doc, getDoc } from "firebase/firestore";
 import { getAuth, signOut } from "firebase/auth";
 
@@ -25,7 +25,7 @@ const menuItems = [
   { title: "Manage Hospitals", icon: FaHospital, path: "/adminhospitals"},
   { title: "Manage Patients", icon: FaUsers, path: "/Patients" },
   { title: "Manage Vaccines", icon: BiInjection, path: "/Vaccines" },
-  { title: "Appointments", icon: BiInjection, path: "/appointments" },
+  { title: "Appointments", icon: MdEventAvailable, path: "/appointments" },
   // { title: "System Settings", icon: FaCog, path: "/admin/settings" },
 ];
 

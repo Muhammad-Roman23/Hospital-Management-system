@@ -183,7 +183,7 @@ export const AvailableVaccines = () => {
             <div className="flex justify-end gap-4 mt-8">
               <button
                 onClick={() => setShowAddModal(false)}
-                className="px-6 py-3 bg-gray-400 hover:bg-gray-500 text-white rounded-xl font-medium transition"
+                className="px-6 py-3 bg-gray-400 hover:bg-gray-500 text-whitapprovee rounded-xl font-medium transition"
               >
                 Cancel
               </button>

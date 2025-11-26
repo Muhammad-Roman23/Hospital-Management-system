@@ -76,11 +76,11 @@ export const Appointments = () => {
     },
   ]);
 
-  const handleApprove = (id) => {
-    setAppointments(prev => prev.map(app => 
-      app.id === id ? { ...app, status: "Approved" } : app
-    ));
-  };
+  // const handleApprove = (id) => {
+  //   setAppointments(prev => prev.map(app => 
+  //     app.id === id ? { ...app, status: "Approved" } : app
+  //   ));
+  // };
 
   const handleReject = (id) => {
     setAppointments(prev => prev.map(app => 
@@ -192,7 +192,7 @@ export const Appointments = () => {
                 {/* Action Buttons */}
                 {app.status === "Pending" && (
                   <div className="flex gap-3 mt-6">
-                    <button
+                    {/* <button
                       onClick={() => handleApprove(app.id)}
                       className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold py-3 rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all duration-300 shadow-lg hover:shadow-emerald-500/50 flex items-center justify-center gap-2 cursor-pointer"
                     >
@@ -205,28 +205,28 @@ export const Appointments = () => {
                     >
                       <BiXCircle className="w-6 h-6" />
                       Reject
-                    </button>
-                  </div>
+                    </button> */}
+                  </div>    
                 )}
 
-                {app.status === "Approved" && (
+                {/* {app.status === "Approved" && (
                   <div className="text-center mt-4">
                     <p className="text-emerald-400 font-semibold">Appointment Confirmed</p>
                   </div>
-                )}
-
+                )} */}
+{/* 
                 {app.status === "Completed" && (
                   <div className="text-center mt-4">
                     <p className="text-cyan-400 font-bold text-lg">Vaccination Completed</p>
                   </div>
-                )}
+                )} */}
 
                 {app.status === "Rejected" && (
                   <div className="text-center mt-4">
                     <p className="text-red-400 font-bold">Appointment Rejected</p>
                   </div>
                 )}
-              </div>
+              </div>  
             );
           })}
         </div>

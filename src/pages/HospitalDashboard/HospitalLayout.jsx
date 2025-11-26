@@ -11,7 +11,7 @@ import { BiInjection } from "react-icons/bi";
 import { doc, getDoc } from "firebase/firestore";
 import { getAuth, signOut } from "firebase/auth";
 import { FiUser } from "react-icons/fi";
-
+import { MdEventAvailable } from "react-icons/md";
 
 
 import { db } from "../../Firebase/Config"; // correct path
@@ -24,7 +24,7 @@ import { db } from "../../Firebase/Config"; // correct path
 const menuItems = [
   { title: "Dashboard", icon: MdDashboard, path: "/hospitaldashboard" },
   { title: "Profile", icon: FiUser, path: "/hospitalprofile" },
-  { title: "Appointments", icon: FiUser, path: "/hospitalappointments" },
+  { title: "Appointments", icon: MdEventAvailable, path: "/hospitalappointments" },
   // { title: "Manage Hospitals", icon: FaHospital, path: "/adminhospitals"},
   // { title: "Manage Patients", icon: FaUsers, path: "/Patients" },
   // { title: "Manage Vaccines", icon: BiInjection, path: "/Vaccines" },
