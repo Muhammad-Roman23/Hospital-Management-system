@@ -83,7 +83,7 @@ export const RegisterPage = () => {
         createdAt: new Date(),
          approved: role === "user" || role === "hospital" ? false : true,
       });
-
+      console.log("done")
       Swal.fire({
         title: `${role.charAt(0).toUpperCase() + role.slice(1)} Registered!`,
         text: "Your account has been created successfully.",
@@ -91,23 +91,42 @@ export const RegisterPage = () => {
         confirmButtonColor: "#0d9488",
       });
         if  (role === "user") navigate("/login");
-      if (role === "hospital") navigate("/login");
-      if (role === "admin") navigate("/login");
+        if (role === "hospital") navigate("/login");
+        if (role === "admin") navigate("/login");
 
       resetForm();
       setRole("user");
     } catch (error) {
-      console.error("Registration Error:", error);
-      let errorMessage = "Registration failed. Please try again.";
-      if (error.code === "auth/email-already-in-use") {
-        errorMessage = "This email is already registered. Please log in instead.";
-      }
-      Swal.fire({
-        title: "Registration Failed",
-        text: errorMessage,
-        icon: "error",
-        confirmButtonColor: "#dc2626",
-      });
+        console.log("🔥 Firebase Error Code:", error.code);
+        console.log("🔥 Firebase Error Message:", error.message);
+
+        let errorMessage = "Registration failed. Please try again.";
+
+        if (error.code === "auth/email-already-in-use") {
+          errorMessage = "This email is already registered. Please log in instead.";
+        } 
+        else if (error.code === "auth/weak-password") {
+          errorMessage = "Password must be at least 6 characters.";
+        } 
+        else if (error.code === "auth/invalid-email") {
+          errorMessage = "Invalid email address.";
+        } 
+        else if (error.code === "auth/operation-not-allowed") {
+          errorMessage = "Email/Password authentication is not enabled in Firebase.";
+        } 
+        else if (error.code === "permission-denied") {
+          errorMessage = "Firestore permission denied. Check security rules.";
+        }
+
+        Swal.fire({
+          title: "Registration Failed",
+          text: errorMessage,
+          icon: "error",
+          confirmButtonColor: "#dc2626",
+        });
+      
+
+     
     }
   };
 
